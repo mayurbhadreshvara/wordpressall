@@ -1,0 +1,34 @@
+// Disable Gutenberg editor
+
+add_filter('use_block_editor_for_post', '__return_false');
+
+//allow svg image
+function cc_mime_types($mimes) {
+    $mimes['svg'] = 'image/svg+xml';
+    return $mimes;
+}
+
+add_filter('upload_mimes', 'cc_mime_types');
+
+// Adding the Options Page in Admin Menu
+add_action('admin_menu', 'linked_url');
+
+function linked_url() {
+    add_menu_page('linked_url', 'Header & Footer Settings', 'read', 'post.php?post=12&action=edit', '', 'dashicons-admin-generic', 90);
+}
+
+//Hiding the Options Page
+
+add_action('pre_get_posts', 'exclude_this_page');
+
+function exclude_this_page($query) {
+    if (!is_admin())
+        return $query;
+    global $pagenow;
+
+    if ('edit.php' == $pagenow && ( get_query_var('post_type') && 'page' == get_query_var('post_type') ))
+        $query->set('post__not_in', array(12)); // array page ids
+    return $query;
+}
+
+//Options Page End
